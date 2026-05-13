@@ -1,0 +1,251 @@
+/* 
+  Premium Calculator Design System 
+  Focus: Glassmorphism (blur effect), Modern Typography, and Smooth Animations.
+*/
+
+/* Root variables allow for easy theme changes across the entire app */
+:root {
+    --bg-dark: #0f172a;               /* Deep navy background for the body */
+    --calc-bg: rgba(30, 41, 59, 0.7);  /* Semi-transparent slate for the glass effect */
+    --display-bg: rgba(15, 23, 42, 0.4); /* Darker, more transparent background for the screen */
+    --text-primary: #f8fafc;          /* Off-white for main text */
+    --text-secondary: #94a3b8;        /* Muted blue-grey for secondary text */
+    --accent-color: #38bdf8;          /* Bright blue for operators and icons */
+    --primary-btn: #0ea5e9;           /* Primary blue for the equals button */
+    --secondary-btn: #334155;         /* Muted button color */
+    --error-color: #f43f5e;           /* Rose/Red for errors and warnings */
+    --glass-border: rgba(255, 255, 255, 0.1); /* Subtle white border for the 'glass' feel */
+    --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.5); /* Deep shadow for depth */
+}
+
+/* Global Reset: Removing default browser margins/padding and setting a modern font */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;            /* Ensures padding doesn't increase element size */
+    font-family: 'Outfit', sans-serif; /* Clean, modern geometric font */
+}
+
+/* Body Styling: Centering the calculator and setting the dark background */
+body {
+    background-color: var(--bg-dark);
+    height: 100vh;                    /* Full viewport height */
+    display: flex;                    /* Flexbox for easy centering */
+    justify-content: center;          /* Horizontal center */
+    align-items: center;              /* Vertical center */
+    overflow: hidden;                 /* Prevents scrolling during animations */
+}
+
+/* Background Blobs: These create the colorful, blurred 'lava lamp' effect behind the UI */
+.background-blobs {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;                      /* Keeps blobs behind everything else */
+}
+
+/* Generic styling for all background blobs */
+.blob {
+    position: absolute;
+    filter: blur(80px);               /* Creates the soft, glowy look */
+    border-radius: 50%;
+    opacity: 0.5;
+    animation: move 20s infinite alternate ease-in-out; /* Slow floating movement */
+}
+
+.blob-1 {
+    width: 400px;
+    height: 400px;
+    background: #0ea5e9;
+    top: -100px;
+    left: -100px;
+}
+
+.blob-2 {
+    width: 300px;
+    height: 300px;
+    background: #6366f1;
+    bottom: -50px;
+    right: -50px;
+    animation-delay: -5s;             /* Staggers the animation timing */
+}
+
+.blob-3 {
+    width: 250px;
+    height: 250px;
+    background: #d946ef;
+    top: 40%;
+    left: 60%;
+    animation-delay: -10s;
+}
+
+/* Animation keyframes for the background blobs to float slightly */
+@keyframes move {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(50px, 50px) scale(1.1); }
+}
+
+/* Main Calculator Container: The 'Glass' shell */
+.calculator-container {
+    background: var(--calc-bg);
+    backdrop-filter: blur(16px);       /* The magic behind the 'glass' effect */
+    -webkit-backdrop-filter: blur(16px); /* Safari support */
+    border: 1px solid var(--glass-border);
+    border-radius: 32px;
+    padding: 24px;
+    width: 360px;
+    box-shadow: var(--shadow-lg);
+    animation: slideIn 0.8s cubic-bezier(0.16, 1, 0.3, 1); /* Smooth entry animation */
+}
+
+/* Animation for the calculator sliding up into view on load */
+@keyframes slideIn {
+    from { transform: translateY(40px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* Header inside the calculator (Title and Indicator) */
+.calc-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 0 8px;
+}
+
+.calc-header h1 {
+    color: var(--text-secondary);
+    font-size: 14px;
+    letter-spacing: 2px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+/* A small glowing dot to indicate the app is 'active' */
+.status-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--accent-color);
+    box-shadow: 0 0 10px var(--accent-color);
+}
+
+/* Display Area: Where the math happens */
+.display-area {
+    background: var(--display-bg);
+    border-radius: 20px;
+    padding: 24px;
+    margin-bottom: 24px;
+    text-align: right;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;           /* Stack elements vertically */
+    justify-content: flex-end;        /* Keep numbers at the bottom */
+    overflow: hidden;                 /* Prevents numbers from breaking layout */
+    position: relative;
+}
+
+/* The smaller text showing the previous calculation */
+.previous-operand {
+    color: var(--text-secondary);
+    font-size: 16px;
+    min-height: 24px;
+    word-break: break-all;            /* Wrap long numbers */
+}
+
+/* The large text for the current input/result */
+.current-operand {
+    color: var(--text-primary);
+    font-size: 40px;
+    font-weight: 600;
+    word-break: break-all;
+    transition: all 0.2s ease;
+}
+
+/* Error text styling */
+.error-message {
+    color: var(--error-color);
+    font-size: 12px;
+    margin-top: 4px;
+    min-height: 16px;
+}
+
+/* Button Grid: 4 columns of equal width */
+.button-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+/* Base button styling */
+.btn {
+    border: none;
+    border-radius: 16px;
+    height: 64px;
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.05); /* Very subtle white overlay */
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid transparent;
+}
+
+/* Hover Effect: Brightens button and lifts it slightly */
+.btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+    border-color: var(--glass-border);
+}
+
+/* Active Effect: Creates a 'tactile' press feeling */
+.btn:active {
+    transform: translateY(1px) scale(0.95);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+/* Styling for AC, DEL, and % buttons */
+.btn-secondary {
+    color: var(--accent-color);
+    background: rgba(56, 189, 248, 0.1);
+}
+
+/* Operator buttons (+, -, etc.) styling */
+.btn-accent {
+    color: var(--accent-color);
+    font-size: 24px;
+}
+
+/* Equals button styling (Bright Blue) */
+.btn-primary {
+    background: var(--primary-btn);
+    box-shadow: 0 4px 15px rgba(14, 165, 233, 0.4);
+}
+
+.btn-primary:hover {
+    background: #0284c7;
+    border-color: transparent;
+}
+
+/* Large button for '0' spanning two columns */
+.btn-large {
+    grid-column: span 2;
+}
+
+/* Responsive adjustments for smaller screens or shorter browser windows */
+@media (max-height: 600px) {
+    .calculator-container {
+        padding: 16px;
+    }
+    .btn {
+        height: 50px;
+    }
+    .current-operand {
+        font-size: 32px;
+    }
+}
